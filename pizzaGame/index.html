@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Warm</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid #333;
+        }
+        #canvasBg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            z-index: -1;
+        }
+        #canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform : translate(-50%,-50%)
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvasBg" width="300" height="300"></canvas>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    
+    <script src="./tile.js"></script>
+    <script src="./worm.js"></script>
+    <script src="./pizza.js"></script>
+    <script>
+        // 게임판
+        const canvas = document.querySelector("#canvas")
+        const ctx = canvas.getContext('2d')
+
+        // 게임 배경
+        const canvasBg = document.querySelector("#canvasBg")
+        const ctxBg = canvasBg.getContext('2d')
+
+        // 타일 ( 10 x 10 )
+        const tileSize = 10;
+        const cWidth = canvas.width;
+        const cHeight = canvas.height;
+
+        // 타일 갯수
+        const tileWidth = cWidth / tileSize;
+        const tileHeight = cHeight / tileSize;
+
+        let playId;
+
+        // 점수
+        let score = 0;
+
+        const renderScore = () => {
+            ctx.font = '16px Helvetica';
+            ctx.fillStyle = 'black';
+            ctx.fillText(`SCORE : ${score}` , 10 , 30)
+        }
+
+        // 게임오버
+        const renderOver = () => {
+            cancelAnimationFrame(playId);
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center'
+            ctx.font = '20px Helvetica';
+            ctx.fillStyle = 'red';
+            ctx.fillText('Game Over' , cWidth/2 , cHeight/2);
+        }
+        
+
+        const worm = new Worm();
+        const pizza = new Pizza();
+
+        // 이벤트 리스너
+        document.body.addEventListener('keydown',(event) => {
+            if(event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                worm.checkDirection(event.key);
+            }
+        })
+
+        const playGame = () => {
+
+            setTimeout(() => {
+                playId = requestAnimationFrame(playGame);
+                ctx.clearRect(0, 0, cWidth, cHeight);
+                worm.moveWorm();
+                worm.renderWorm();
+                pizza.renderPizza();
+            }, 100);
+        }
+
+        requestAnimationFrame(playGame);
+    </script>
+</body>
+</html>
